@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Database</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+<link href="{% static "css/base.css" %}" rel="stylesheet">
+
+
+
+</head>
+<body>
+
+<h1 id="intro"> BAZA DANYCH FIRM </h1>
+
+<form id="form" action="." method="post">
+    {% csrf_token %}
+    {{ form }}
+    {{ form_kraj }}
+    <input class="button" type="submit" value="Filtruj">
+</form>
+
+
+<div id="map"></div>
+<script>
+var map = L.map('map').setView([51.505, 10], 4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+
+{% for lis in lista %}
+{% if lis.miasto %}
+var greenIcon = L.icon({
+    iconUrl: '{{ lis.logo.url }}',
+    iconSize:     [80, 80], // size of the icon
+    iconAnchor:   [30, 30], // point of the icon which will correspond to marker's location
+    popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+});
+{% endif %}
+
+L.marker([{{ lis.wyskosc }}, {{ lis.szerokosc }}], {icon: greenIcon}).addTo(map).bindPopup('{{ lis.nazwa  }} <br> <a href="{{ lis.strona }}">{{ lis.strona }}</a>');
+{% endfor %}
+
+ </script>
+
+
+<div class="row">
+{% for lis in lista %}
+<div class="column">
+<p>{{ lis.nazwa }} </p>
+<img  src="{% if lis.logo %}{{ lis.logo.url }}{% else %}{% static "img/no_image.png" %}{% endif %}" width="300" height="200">
+</div>
+{% endfor %}
+  </div>
+</div>
+
+
+</body>
+</html>
